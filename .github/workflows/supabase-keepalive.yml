@@ -32,6 +32,22 @@
 #   Verify immediately: Actions tab → "Supabase keepalive" → "Run workflow".
 #   Green = working. Red = the annotation says exactly what is wrong (most
 #   commonly: secret missing, or pointing at the wrong/empty project).
+#
+# ── KNOWN TRAP: the schedule can stop silently ───────────────────────────────
+#   GitHub ties a cron schedule to the account that last committed to this file.
+#   If that account loses access (removed from the org) or the repo is
+#   transferred, the schedule quietly stops firing while the workflow still
+#   shows as "active" in the UI. This happened in July 2026: the last committer
+#   was removed during the ownership handover and no scheduled run fired for
+#   over a week.
+#
+#   How to spot it: in the Actions tab, check the run list for runs whose
+#   trigger is "schedule". Only ever seeing "workflow_dispatch" runs means the
+#   schedule is dead, even though every one of those manual runs passed.
+#   A green manual run is NOT proof the schedule works.
+#
+#   How to fix it: commit any change to this file from an account that
+#   currently has write access. That re-registers the cron.
 # ─────────────────────────────────────────────────────────────────────────────
 
 name: Supabase keepalive
