@@ -1,4 +1,17 @@
 # ─────────────────────────────────────────────────────────────────────────────
+# ⚠️  SUPERSEDED (August 2026) - this workflow is NOT the active keepalive.
+#
+#   The live keepalive is now a Vercel Cron job: see `api/keepalive.js` and the
+#   "crons" block in `vercel.json`. It runs daily and is tied to the Vercel
+#   project rather than to a GitHub user account.
+#
+#   This file is kept for two reasons: the KNOWN TRAP section below documents a
+#   real failure mode worth not rediscovering, and if GitHub's scheduler ever
+#   revives, an extra ping is harmless. It has not fired on schedule since the
+#   July 2026 ownership transfer, and two attempts to revive it failed, during
+#   which the database paused twice. Do not rely on it.
+# ─────────────────────────────────────────────────────────────────────────────
+#
 # Supabase free-tier keepalive
 #
 # WHY THIS EXISTS

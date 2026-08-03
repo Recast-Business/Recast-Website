@@ -9,6 +9,10 @@ const brands = [
   "Kalshi",
   "Dimebit",
   "BetOnline",
+  "Roobet",
+  "Gamba",
+  "Jack.com",
+  "Telegram",
 ];
 
 const Brands = () => {
