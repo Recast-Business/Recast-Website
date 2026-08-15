@@ -116,10 +116,31 @@ export default {
         at: new Date().toISOString(),
       });
     } catch (error) {
+      // Node's fetch reports almost everything as a bare "fetch failed" and
+      // hides the real reason on .cause, so surface both. A DNS failure
+      // (ENOTFOUND / EAI_AGAIN) against a *.supabase.co host almost always
+      // means the project is paused, which is the exact condition this
+      // endpoint exists to prevent.
       const message = error instanceof Error ? error.message : String(error);
-      console.error(`keepalive ERROR reaching ${origin}: ${message}`);
+      const cause = error?.cause?.code ?? error?.cause?.message ?? null;
+      const looksPaused = cause === "ENOTFOUND" || cause === "EAI_AGAIN";
+
+      console.error(
+        `keepalive ERROR reaching ${origin}: ${message}` +
+          (cause ? ` (cause: ${cause})` : "") +
+          (looksPaused ? " -- host does not resolve, the Supabase project is most likely PAUSED" : ""),
+      );
+
       return Response.json(
-        { ok: false, error: message },
+        {
+          ok: false,
+          target: origin,
+          error: message,
+          cause,
+          hint: looksPaused
+            ? "Host does not resolve. The Supabase project is most likely paused; restore it from the Supabase dashboard."
+            : undefined,
+        },
         { status: 502 },
       );
     }
