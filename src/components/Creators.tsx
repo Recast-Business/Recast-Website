@@ -21,6 +21,11 @@ import nikan from "@/assets/nikan.jpg";
 import azraRamic from "@/assets/azra-ramic.jpg";
 import bellaRama from "@/assets/bella-rama.jpg";
 
+import edMatthews from "@/assets/ed-matthews.jpg";
+import oblivion from "@/assets/oblivion.jpg";
+import zavala from "@/assets/zavala.jpg";
+import cobyPersin from "@/assets/coby-persin.jpg";
+
 type Creator = {
   name: string;
   img: string;
@@ -65,6 +70,13 @@ const creators: Creator[] = ([
   { name: "RDJavi", img: rdjavi, platform: "Instagram", followers: "1.9M" },
   { name: "FaZe Nikan", img: nikan, platform: "YouTube", followers: "1.3M" },
   { name: "Azra Ramic", img: azraRamic, platform: "Instagram", followers: "378K" },
+
+  { name: "Coby Persin", img: cobyPersin, platform: "Instagram", followers: "1.6M" },
+  { name: "Zavala", img: zavala, platform: "TikTok", followers: "1.4M" },
+  // Full-body shot, so zoom in on the upper frame to bring his face up to a
+  // similar size to the other cards. Adjust this number if it reads wrong.
+  { name: "Oblivion", img: oblivion, platform: "Instagram", followers: "768K", cropScale: 1.6 },
+  { name: "Ed Matthews", img: edMatthews, platform: "Instagram", followers: "383K" },
 ] satisfies Creator[]).sort(
   (a, b) => followersToNumber(b.followers) - followersToNumber(a.followers),
 );

@@ -97,6 +97,9 @@ export default {
         "accordion-up": "accordion-up 0.2s ease-out",
         "float": "float 3s ease-in-out infinite",
         "scroll-right": "scroll-right 25s linear infinite",
+        // Slower variant for the brand marquee only. The creator carousel
+        // keeps the 25s pace; brands read better with a bit more time.
+        "scroll-right-slow": "scroll-right 35s linear infinite",
       },
     },
   },

@@ -27,7 +27,7 @@ const Brands = () => {
         . Our creators have worked with .
       </motion.p>
       <div className="overflow-hidden">
-        <div className="marquee-track animate-scroll-right">
+        <div className="marquee-track animate-scroll-right-slow">
           {[...brands, ...brands, ...brands, ...brands].map((brand, i) => (
             <span key={i} className="flex items-center gap-16 md:gap-20 px-8 md:px-10">
               <motion.span
