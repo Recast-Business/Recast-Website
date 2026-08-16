@@ -32,6 +32,11 @@ type Creator = {
   platform: string;
   followers: string;
   cropScale?: number;
+  // Which part of the photo to keep when it is cropped to the card. Defaults
+  // to centre. The mobile card (176x224) is proportionally wider than the
+  // desktop one (288x448), so it crops more off the top and bottom, which can
+  // behead a subject whose face sits high in the frame.
+  objectPosition?: string;
 };
 
 // "2.68M" -> 2680000, "635K" -> 635000. Used only for ordering.
@@ -73,10 +78,11 @@ const creators: Creator[] = ([
 
   { name: "Coby Persin", img: cobyPersin, platform: "Instagram", followers: "1.6M" },
   { name: "Zavala", img: zavala, platform: "TikTok", followers: "1.4M" },
-  // Full-body shot, so it needs a slight zoom to bring his face closer to the
-  // size of the other cards. Kept low deliberately: the source is only 548px
-  // wide, so zooming harder visibly softens it.
-  { name: "Oblivion", img: oblivion, platform: "TikTok", followers: "1.1M", cropScale: 1.25 },
+  // Full-body shot with his face high in the frame. Anchored to the top so
+  // the crop takes his legs rather than his head, which is what a centred
+  // crop did on mobile. The zoom is kept mild because the source is only
+  // 548px wide and zooming harder visibly softens it.
+  { name: "Oblivion", img: oblivion, platform: "TikTok", followers: "1.1M", cropScale: 1.1, objectPosition: "50% 12%" },
   { name: "Ed Matthews", img: edMatthews, platform: "Instagram", followers: "383K" },
 ] satisfies Creator[]).sort(
   (a, b) => followersToNumber(b.followers) - followersToNumber(a.followers),
@@ -100,7 +106,7 @@ const EAGER_PRIORITY_COUNT = 8;
 // tab. A keyframe animation with no fill-mode has no such failure mode: it
 // plays once on mount, and at every other moment the image simply has its
 // normal opacity, so the worst case is an image that is visible.
-const CreatorCard = ({ name, img, platform, followers, cropScale, isPriority }: Creator & { isPriority: boolean }) => (
+const CreatorCard = ({ name, img, platform, followers, cropScale, objectPosition, isPriority }: Creator & { isPriority: boolean }) => (
   <div className="flex-shrink-0 w-44 sm:w-56 md:w-72 group cursor-pointer">
     <div className="relative overflow-hidden rounded-sm border border-border group-hover:border-blue-accent/40 transition-all duration-500 bg-muted/20">
       <img
@@ -112,7 +118,10 @@ const CreatorCard = ({ name, img, platform, followers, cropScale, isPriority }: 
         width={288}
         height={448}
         className="w-44 h-56 sm:w-56 sm:h-72 md:w-72 md:h-[28rem] object-cover animate-image-fade-in"
-        style={cropScale ? { transform: `scale(${cropScale})`, transformOrigin: "top center" } : undefined}
+        style={{
+          ...(cropScale ? { transform: `scale(${cropScale})`, transformOrigin: "top center" } : {}),
+          ...(objectPosition ? { objectPosition } : {}),
+        }}
       />
       <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent p-3 md:p-4">
         <p className="text-white font-display font-bold text-sm md:text-base tracking-tight">{name}</p>

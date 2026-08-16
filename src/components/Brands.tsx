@@ -44,7 +44,20 @@ const Brands = () => {
                   {brand}
                 </span>
               </motion.span>
-              <span className="text-blue-accent/20">♠</span>
+              {/*
+                U+FE0E (the variation selector after the spade) forces text
+                presentation. Without it iOS renders U+2660 as a colour emoji
+                spade, so the separator looks like a different design element
+                on a phone than it does on desktop, where it renders as the
+                styled text glyph. font-variant-emoji is the modern equivalent
+                and is set alongside it for browsers that support it.
+              */}
+              <span
+                className="text-blue-accent/20 text-base md:text-lg leading-none"
+                style={{ fontVariantEmoji: "text" } as React.CSSProperties}
+              >
+                {"♠︎"}
+              </span>
             </span>
           ))}
         </div>

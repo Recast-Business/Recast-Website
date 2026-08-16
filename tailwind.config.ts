@@ -104,7 +104,7 @@ export default {
         // regardless of screen size, so on a narrow phone they cross the
         // viewport far more times per second and feel frantic. Each has a
         // slower mobile variant, applied via a responsive class.
-        "scroll-right": "scroll-right 27.5s linear infinite",      // creators, desktop
+        "scroll-right": "scroll-right 32.5s linear infinite",      // creators, desktop
         "scroll-right-mobile": "scroll-right 44s linear infinite", // creators, phone
         "scroll-right-slow": "scroll-right 35s linear infinite",   // brands, desktop
         "scroll-right-slow-mobile": "scroll-right 50s linear infinite", // brands, phone
