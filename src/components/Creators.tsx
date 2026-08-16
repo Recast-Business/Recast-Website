@@ -21,7 +21,29 @@ import nikan from "@/assets/nikan.jpg";
 import azraRamic from "@/assets/azra-ramic.jpg";
 import bellaRama from "@/assets/bella-rama.jpg";
 
-const creators: { name: string; img: string; platform: string; followers: string; cropScale?: number }[] = [
+type Creator = {
+  name: string;
+  img: string;
+  platform: string;
+  followers: string;
+  cropScale?: number;
+};
+
+// "2.68M" -> 2680000, "635K" -> 635000. Used only for ordering.
+const followersToNumber = (followers: string): number => {
+  const match = /^([\d.]+)\s*([KM]?)/i.exec(followers.trim());
+  if (!match) return 0;
+  const value = parseFloat(match[1]);
+  const suffix = match[2].toUpperCase();
+  if (suffix === "M") return value * 1_000_000;
+  if (suffix === "K") return value * 1_000;
+  return value;
+};
+
+// Sorted largest audience first so the biggest names lead the carousel.
+// Sorting here rather than by hand keeps that true whenever the follower
+// figures are refreshed, instead of silently drifting out of order.
+const creators: Creator[] = ([
   { name: "Teeqo", img: teeqo, platform: "YouTube", followers: "2.68M" },
   { name: "H1ghSky1", img: highsky, platform: "YouTube", followers: "2.5M" },
   { name: "K Jane Caron", img: kJaneCaron, platform: "Instagram", followers: "635K" },
@@ -36,14 +58,16 @@ const creators: { name: string; img: string; platform: string; followers: string
   { name: "FaZe Jarvis", img: jarvis, platform: "YouTube", followers: "5.69M" },
   { name: "Jonathan Peters", img: jonathanPeters, platform: "Instagram", followers: "9M" },
   { name: "Hannah Marbles", img: hannahMarbles, platform: "YouTube", followers: "1.86M" },
-  { name: "Frazier", img: frazier, platform: "YouTube", followers: "9.2M" },
+  { name: "Frazier K", img: frazier, platform: "YouTube", followers: "9.2M" },
   { name: "Elzein", img: elzein, platform: "Instagram", followers: "932K" },
   { name: "Bella Rama", img: bellaRama, platform: "Instagram", followers: "1.1M" },
   { name: "Sachaumazaki", img: sachaumazaki, platform: "TikTok", followers: "314K" },
   { name: "RDJavi", img: rdjavi, platform: "Instagram", followers: "1.9M" },
-  { name: "Nikan", img: nikan, platform: "YouTube", followers: "1.3M" },
+  { name: "FaZe Nikan", img: nikan, platform: "YouTube", followers: "1.3M" },
   { name: "Azra Ramic", img: azraRamic, platform: "Instagram", followers: "378K" },
-];
+] satisfies Creator[]).sort(
+  (a, b) => followersToNumber(b.followers) - followersToNumber(a.followers),
+);
 
 const CreatorCard = ({ name, img, platform, followers, cropScale }: { name: string; img: string; platform: string; followers: string; cropScale?: number }) => (
   <div className="flex-shrink-0 w-44 sm:w-56 md:w-72 group cursor-pointer">
