@@ -96,10 +96,14 @@ export default {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         "float": "float 3s ease-in-out infinite",
-        "scroll-right": "scroll-right 25s linear infinite",
-        // Slower variant for the brand marquee only. The creator carousel
-        // keeps the 25s pace; brands read better with a bit more time.
-        "scroll-right-slow": "scroll-right 35s linear infinite",
+        // Marquee speeds. Both carousels travel the same absolute distance
+        // regardless of screen size, so on a narrow phone they cross the
+        // viewport far more times per second and feel frantic. Each has a
+        // slower mobile variant, applied via a responsive class.
+        "scroll-right": "scroll-right 25s linear infinite",        // creators, desktop
+        "scroll-right-mobile": "scroll-right 40s linear infinite", // creators, phone
+        "scroll-right-slow": "scroll-right 35s linear infinite",   // brands, desktop
+        "scroll-right-slow-mobile": "scroll-right 50s linear infinite", // brands, phone
       },
     },
   },

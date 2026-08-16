@@ -27,9 +27,13 @@ const Brands = () => {
         . Our creators have worked with .
       </motion.p>
       <div className="overflow-hidden">
-        <div className="marquee-track animate-scroll-right-slow">
+        <div className="marquee-track animate-scroll-right-slow-mobile md:animate-scroll-right-slow">
           {[...brands, ...brands, ...brands, ...brands].map((brand, i) => (
-            <span key={i} className="flex items-center gap-16 md:gap-20 px-8 md:px-10">
+            // Spacing is scaled down on small screens. At the desktop values
+            // (64px gap plus 32px padding each side) a 375px phone shows barely
+            // one brand with the ace marooned in empty space, which reads
+            // nothing like the desktop rhythm.
+            <span key={i} className="flex items-center gap-6 sm:gap-10 md:gap-20 px-4 sm:px-6 md:px-10">
               <motion.span
                 className="flex items-center"
                 whileHover={{ scale: 1.05 }}

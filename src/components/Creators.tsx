@@ -1,3 +1,5 @@
+import { useEffect, useRef, useState } from "react";
+
 import charlotteParkes from "@/assets/IMG_6876.jpg";
 import teeqo from "@/assets/teeqo.jpg";
 
@@ -76,7 +78,7 @@ const creators: Creator[] = ([
   // Full-body shot, so it needs a slight zoom to bring his face closer to the
   // size of the other cards. Kept low deliberately: the source is only 548px
   // wide, so zooming harder visibly softens it.
-  { name: "Oblivion", img: oblivion, platform: "Instagram", followers: "768K", cropScale: 1.25 },
+  { name: "Oblivion", img: oblivion, platform: "TikTok", followers: "1.1M", cropScale: 1.25 },
   { name: "Ed Matthews", img: edMatthews, platform: "Instagram", followers: "383K" },
 ] satisfies Creator[]).sort(
   (a, b) => followersToNumber(b.followers) - followersToNumber(a.followers),
@@ -89,36 +91,53 @@ const creators: Creator[] = ([
 // screen at first paint ahead of the ones that scroll in later.
 const EAGER_PRIORITY_COUNT = 8;
 
-const CreatorCard = ({ name, img, platform, followers, cropScale, isPriority }: Creator & { isPriority: boolean }) => (
-  <div className="flex-shrink-0 w-44 sm:w-56 md:w-72 group cursor-pointer">
-    <div className="relative overflow-hidden rounded-sm border border-border group-hover:border-blue-accent/40 transition-all duration-500">
-      <img
-        src={img}
-        alt={`${name} - ${platform} creator`}
-        loading="eager"
-        fetchPriority={isPriority ? "high" : "low"}
-        decoding="async"
-        width={288}
-        height={448}
-        className="w-44 h-56 sm:w-56 sm:h-72 md:w-72 md:h-[28rem] object-cover"
-        style={cropScale ? { transform: `scale(${cropScale})`, transformOrigin: "top center" } : undefined}
-      />
-      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent p-3 md:p-4">
-        <p className="text-white font-display font-bold text-sm md:text-base tracking-tight">{name}</p>
-        <p className="text-white/60 text-[10px] md:text-xs font-medium tracking-wide uppercase">
-          {platform} · {followers}
-        </p>
+const CreatorCard = ({ name, img, platform, followers, cropScale, isPriority }: Creator & { isPriority: boolean }) => {
+  // Fade each photo in as it decodes, so images arrive the same way the rest
+  // of the page does instead of snapping in. Cached images have already
+  // finished loading before this mounts and would never fire onLoad, so the
+  // effect checks `complete` and shows them immediately, with no flash.
+  const imgRef = useRef<HTMLImageElement>(null);
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  useEffect(() => {
+    if (imgRef.current?.complete) setIsLoaded(true);
+  }, []);
+
+  return (
+    <div className="flex-shrink-0 w-44 sm:w-56 md:w-72 group cursor-pointer">
+      <div className="relative overflow-hidden rounded-sm border border-border group-hover:border-blue-accent/40 transition-all duration-500 bg-muted/20">
+        <img
+          ref={imgRef}
+          src={img}
+          alt={`${name} - ${platform} creator`}
+          loading="eager"
+          fetchPriority={isPriority ? "high" : "low"}
+          decoding="async"
+          onLoad={() => setIsLoaded(true)}
+          width={288}
+          height={448}
+          className={`w-44 h-56 sm:w-56 sm:h-72 md:w-72 md:h-[28rem] object-cover transition-opacity duration-700 ease-out ${
+            isLoaded ? "opacity-100" : "opacity-0"
+          }`}
+          style={cropScale ? { transform: `scale(${cropScale})`, transformOrigin: "top center" } : undefined}
+        />
+        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent p-3 md:p-4">
+          <p className="text-white font-display font-bold text-sm md:text-base tracking-tight">{name}</p>
+          <p className="text-white/60 text-[10px] md:text-xs font-medium tracking-wide uppercase">
+            {platform} · {followers}
+          </p>
+        </div>
       </div>
     </div>
-  </div>
-);
+  );
+};
 
 const Creators = () => {
   return (
     <section className="py-4 md:py-6 overflow-hidden bg-background">
       <div className="relative overflow-hidden">
         <div
-          className="flex gap-0 w-max animate-scroll-right"
+          className="flex gap-0 w-max animate-scroll-right-mobile md:animate-scroll-right"
           style={{ willChange: "transform" }}
         >
           {[...creators, ...creators].map((creator, index) => (
