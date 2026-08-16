@@ -58,7 +58,7 @@ const creators: Creator[] = ([
   { name: "FaZe Jarvis", img: jarvis, platform: "YouTube", followers: "5.69M" },
   { name: "Jonathan Peters", img: jonathanPeters, platform: "Instagram", followers: "9M" },
   { name: "Hannah Marbles", img: hannahMarbles, platform: "YouTube", followers: "1.86M" },
-  { name: "Frazier K", img: frazier, platform: "YouTube", followers: "9.2M" },
+  { name: "Frazier Kay", img: frazier, platform: "YouTube", followers: "9.2M" },
   { name: "Elzein", img: elzein, platform: "Instagram", followers: "932K" },
   { name: "Bella Rama", img: bellaRama, platform: "Instagram", followers: "1.1M" },
   { name: "Sachaumazaki", img: sachaumazaki, platform: "TikTok", followers: "314K" },
