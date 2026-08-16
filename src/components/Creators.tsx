@@ -1,5 +1,3 @@
-import { useEffect, useRef, useState } from "react";
-
 import charlotteParkes from "@/assets/IMG_6876.jpg";
 import teeqo from "@/assets/teeqo.jpg";
 
@@ -91,46 +89,40 @@ const creators: Creator[] = ([
 // screen at first paint ahead of the ones that scroll in later.
 const EAGER_PRIORITY_COUNT = 8;
 
-const CreatorCard = ({ name, img, platform, followers, cropScale, isPriority }: Creator & { isPriority: boolean }) => {
-  // Fade each photo in as it decodes, so images arrive the same way the rest
-  // of the page does instead of snapping in. Cached images have already
-  // finished loading before this mounts and would never fire onLoad, so the
-  // effect checks `complete` and shows them immediately, with no flash.
-  const imgRef = useRef<HTMLImageElement>(null);
-  const [isLoaded, setIsLoaded] = useState(false);
-
-  useEffect(() => {
-    if (imgRef.current?.complete) setIsLoaded(true);
-  }, []);
-
-  return (
-    <div className="flex-shrink-0 w-44 sm:w-56 md:w-72 group cursor-pointer">
-      <div className="relative overflow-hidden rounded-sm border border-border group-hover:border-blue-accent/40 transition-all duration-500 bg-muted/20">
-        <img
-          ref={imgRef}
-          src={img}
-          alt={`${name} - ${platform} creator`}
-          loading="eager"
-          fetchPriority={isPriority ? "high" : "low"}
-          decoding="async"
-          onLoad={() => setIsLoaded(true)}
-          width={288}
-          height={448}
-          className={`w-44 h-56 sm:w-56 sm:h-72 md:w-72 md:h-[28rem] object-cover transition-opacity duration-700 ease-out ${
-            isLoaded ? "opacity-100" : "opacity-0"
-          }`}
-          style={cropScale ? { transform: `scale(${cropScale})`, transformOrigin: "top center" } : undefined}
-        />
-        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent p-3 md:p-4">
-          <p className="text-white font-display font-bold text-sm md:text-base tracking-tight">{name}</p>
-          <p className="text-white/60 text-[10px] md:text-xs font-medium tracking-wide uppercase">
-            {platform} · {followers}
-          </p>
-        </div>
+// Photos fade in rather than snapping in, on desktop and mobile alike.
+//
+// This is a plain CSS animation rather than a JavaScript state transition,
+// which is a deliberate choice after the state-driven version proved fragile.
+// Driving it from JS meant the reveal depended on a load event that never
+// fires for cached images, and the workarounds for that (a frame callback, or
+// a timer) do not run or do not animate while a tab is hidden, which left
+// images stranded at zero opacity when the site was opened in a background
+// tab. A keyframe animation with no fill-mode has no such failure mode: it
+// plays once on mount, and at every other moment the image simply has its
+// normal opacity, so the worst case is an image that is visible.
+const CreatorCard = ({ name, img, platform, followers, cropScale, isPriority }: Creator & { isPriority: boolean }) => (
+  <div className="flex-shrink-0 w-44 sm:w-56 md:w-72 group cursor-pointer">
+    <div className="relative overflow-hidden rounded-sm border border-border group-hover:border-blue-accent/40 transition-all duration-500 bg-muted/20">
+      <img
+        src={img}
+        alt={`${name} - ${platform} creator`}
+        loading="eager"
+        fetchPriority={isPriority ? "high" : "low"}
+        decoding="async"
+        width={288}
+        height={448}
+        className="w-44 h-56 sm:w-56 sm:h-72 md:w-72 md:h-[28rem] object-cover animate-image-fade-in"
+        style={cropScale ? { transform: `scale(${cropScale})`, transformOrigin: "top center" } : undefined}
+      />
+      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent p-3 md:p-4">
+        <p className="text-white font-display font-bold text-sm md:text-base tracking-tight">{name}</p>
+        <p className="text-white/60 text-[10px] md:text-xs font-medium tracking-wide uppercase">
+          {platform} · {followers}
+        </p>
       </div>
     </div>
-  );
-};
+  </div>
+);
 
 const Creators = () => {
   return (

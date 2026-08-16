@@ -91,6 +91,10 @@ export default {
           "0%": { transform: "translate3d(0, 0, 0)" },
           "100%": { transform: "translate3d(-50%, 0, 0)" },
         },
+        "image-fade-in": {
+          from: { opacity: "0" },
+          to: { opacity: "1" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -104,6 +108,10 @@ export default {
         "scroll-right-mobile": "scroll-right 40s linear infinite", // creators, phone
         "scroll-right-slow": "scroll-right 35s linear infinite",   // brands, desktop
         "scroll-right-slow-mobile": "scroll-right 50s linear infinite", // brands, phone
+        // Deliberately has no fill-mode: outside the animation the element
+        // keeps its normal opacity of 1. If the animation never runs the
+        // image is simply visible, so this cannot strand an image invisible.
+        "image-fade-in": "image-fade-in 0.7s ease-out",
       },
     },
   },
