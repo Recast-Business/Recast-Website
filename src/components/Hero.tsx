@@ -10,7 +10,7 @@ const Hero = () => {
       <LoopingVideo
         src="/hero-bg.mp4"
         className="absolute inset-0 w-full h-full object-cover z-0"
-        poster="/og-image.png"
+        poster="/hero-poster.jpg"
       />
       <div className="absolute inset-0 bg-background/70 z-0" aria-hidden="true" />
 
