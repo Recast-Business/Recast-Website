@@ -12,7 +12,7 @@ import samulx from "@/assets/samulx.webp";
 import harrietParkes from "@/assets/harriet-parkes.webp";
 import jarvis from "@/assets/jarvis.webp";
 import jonathanPeters from "@/assets/jonathan-peters.webp";
-import hannahMarbles from "@/assets/Screenshot 2026-03-30 at 18.29.54.png";
+import hannahMarbles from "@/assets/hannah-marbles-photo.jpg";
 import frazier from "@/assets/frazier.jpg";
 import elzein from "@/assets/elzein.jpg";
 import sachaumazaki from "@/assets/sachaumazaki.jpg";
@@ -73,21 +73,30 @@ const creators: Creator[] = ([
 
   { name: "Coby Persin", img: cobyPersin, platform: "Instagram", followers: "1.6M" },
   { name: "Zavala", img: zavala, platform: "TikTok", followers: "1.4M" },
-  // Full-body shot, so zoom in on the upper frame to bring his face up to a
-  // similar size to the other cards. Adjust this number if it reads wrong.
-  { name: "Oblivion", img: oblivion, platform: "Instagram", followers: "768K", cropScale: 1.6 },
+  // Full-body shot, so it needs a slight zoom to bring his face closer to the
+  // size of the other cards. Kept low deliberately: the source is only 548px
+  // wide, so zooming harder visibly softens it.
+  { name: "Oblivion", img: oblivion, platform: "Instagram", followers: "768K", cropScale: 1.25 },
   { name: "Ed Matthews", img: edMatthews, platform: "Instagram", followers: "383K" },
 ] satisfies Creator[]).sort(
   (a, b) => followersToNumber(b.followers) - followersToNumber(a.followers),
 );
 
-const CreatorCard = ({ name, img, platform, followers, cropScale }: { name: string; img: string; platform: string; followers: string; cropScale?: number }) => (
+// The carousel scrolls continuously, so lazy loading guarantees visible
+// pop-in: a card's image only starts downloading once it has already slid
+// into view. Everything is loaded eagerly instead. The images total well
+// under a megabyte, and priority is used to load the cards that are on
+// screen at first paint ahead of the ones that scroll in later.
+const EAGER_PRIORITY_COUNT = 8;
+
+const CreatorCard = ({ name, img, platform, followers, cropScale, isPriority }: Creator & { isPriority: boolean }) => (
   <div className="flex-shrink-0 w-44 sm:w-56 md:w-72 group cursor-pointer">
     <div className="relative overflow-hidden rounded-sm border border-border group-hover:border-blue-accent/40 transition-all duration-500">
       <img
         src={img}
         alt={`${name} - ${platform} creator`}
-        loading="lazy"
+        loading="eager"
+        fetchPriority={isPriority ? "high" : "low"}
         decoding="async"
         width={288}
         height={448}
@@ -113,7 +122,11 @@ const Creators = () => {
           style={{ willChange: "transform" }}
         >
           {[...creators, ...creators].map((creator, index) => (
-            <CreatorCard key={`${creator.name}-${index}`} name={creator.name} img={creator.img} platform={creator.platform} followers={creator.followers} cropScale={creator.cropScale} />
+            <CreatorCard
+              key={`${creator.name}-${index}`}
+              {...creator}
+              isPriority={index < EAGER_PRIORITY_COUNT}
+            />
           ))}
         </div>
       </div>
