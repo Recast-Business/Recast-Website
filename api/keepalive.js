@@ -37,6 +37,8 @@
 //                  That distinction is exactly what hid the previous outages.
 // ─────────────────────────────────────────────────────────────────────────────
 
+import { heartbeat } from "./_monitor.js";
+
 const TABLE = "applications";
 const UPSTREAM_TIMEOUT_MS = 20_000;
 
@@ -65,6 +67,7 @@ export default {
         !anonKey && "VITE_SUPABASE_PUBLISHABLE_KEY",
       ].filter(Boolean).join(", ");
       console.error(`keepalive: missing env var(s): ${missing}`);
+      await heartbeat("fail", `Missing env var(s): ${missing}`);
       return Response.json(
         { ok: false, error: `Missing env var(s): ${missing}` },
         { status: 500 },
@@ -74,9 +77,13 @@ export default {
     // 3. Normalise the URL down to its origin. A pasted value carrying a
     //    trailing slash, a path, or stray whitespace previously produced an
     //    opaque PGRST125 "Invalid path specified in request URL" error.
-    const origin = rawUrl.match(/^https?:\/\/[A-Za-z0-9.-]+/)?.[0];
+    // The optional port group matters only off production (Supabase URLs
+    // carry no port), but without it the origin silently loses the port,
+    // which makes this function impossible to exercise against a local stub.
+    const origin = rawUrl.match(/^https?:\/\/[A-Za-z0-9.-]+(?::\d+)?/)?.[0];
     if (!origin) {
       console.error(`keepalive: VITE_SUPABASE_URL is not a URL: ${rawUrl}`);
+      await heartbeat("fail", `VITE_SUPABASE_URL is not a URL: ${rawUrl}`);
       return Response.json(
         { ok: false, error: "VITE_SUPABASE_URL is not a valid URL" },
         { status: 500 },
@@ -103,6 +110,7 @@ export default {
         console.error(
           `keepalive FAILED: HTTP ${upstream.status} from ${origin} :: ${body}`,
         );
+        await heartbeat("fail", `HTTP ${upstream.status} from ${origin} :: ${body}`);
         return Response.json(
           { ok: false, upstreamStatus: upstream.status, body },
           { status: 502 },
@@ -110,6 +118,7 @@ export default {
       }
 
       console.log(`keepalive OK: HTTP 200 from ${origin}`);
+      await heartbeat("ok", `HTTP 200 from ${origin}`);
       return Response.json({
         ok: true,
         pinged: origin,
@@ -129,6 +138,13 @@ export default {
         `keepalive ERROR reaching ${origin}: ${message}` +
           (cause ? ` (cause: ${cause})` : "") +
           (looksPaused ? " -- host does not resolve, the Supabase project is most likely PAUSED" : ""),
+      );
+
+      await heartbeat(
+        "fail",
+        `Cannot reach ${origin}: ${message}` +
+          (cause ? ` (cause: ${cause})` : "") +
+          (looksPaused ? " -- the Supabase project is most likely PAUSED" : ""),
       );
 
       return Response.json(
